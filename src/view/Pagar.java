@@ -6,10 +6,13 @@
 package view;
 
 import java.rmi.Naming;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import javax.swing.table.DefaultTableModel;
 import jwt.JWT;
 import sistema.Factura;
 import sistema.IOperacionesEmpresa;
+import wscliente.Cotizacion;
 
 /**
  *
@@ -33,6 +36,13 @@ public class Pagar extends javax.swing.JFrame {
         String datos[][] ={};
         modelo = new DefaultTableModel(datos,cabecera);
         tbLista.setModel(modelo);
+        java.util.Date utilDate = new java.util.Date(); //fecha actual
+        long lnMilisegundos = utilDate.getTime();
+        Date sqlDate = new Date(lnMilisegundos);
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");//"yyyy-MM-dd"
+        String dateString = format.format(sqlDate);
+        Cotizacion cotizacion = new Cotizacion();
+        lbCotizacion.setText(cotizacion.getCotizacion(dateString)+ " Bs.");
     }
 
     /**
@@ -52,6 +62,9 @@ public class Pagar extends javax.swing.JFrame {
         txtIdCliente = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         btnBuscar = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        lbCotizacion = new javax.swing.JLabel();
+        lbpago = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -86,29 +99,42 @@ public class Pagar extends javax.swing.JFrame {
             }
         });
 
+        jLabel3.setText("Cotización del Dolar para hoy : ");
+
+        lbCotizacion.setText("..........");
+
+        lbpago.setText("..........................");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(btnPagar)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addGap(162, 162, 162)
-                            .addComponent(jLabel1)
-                            .addGap(111, 111, 111)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(30, 30, 30)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 535, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(162, 162, 162)
+                        .addComponent(jLabel1))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(23, 23, 23)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtIdCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnBuscar)))
-                .addContainerGap(20, Short.MAX_VALUE))
+                        .addComponent(btnBuscar)
+                        .addGap(32, 32, 32)
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lbCotizacion))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(30, 30, 30)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(6, 6, 6)
+                                .addComponent(lbpago)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnPagar))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 535, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -119,11 +145,15 @@ public class Pagar extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtIdCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2)
-                    .addComponent(btnBuscar))
+                    .addComponent(btnBuscar)
+                    .addComponent(jLabel3)
+                    .addComponent(lbCotizacion))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnPagar)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnPagar)
+                    .addComponent(lbpago))
                 .addContainerGap(9, Short.MAX_VALUE))
         );
 
@@ -134,7 +164,7 @@ public class Pagar extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(50, 50, 50))
+                .addGap(87, 87, 87))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -153,6 +183,16 @@ public class Pagar extends javax.swing.JFrame {
             JWT jwt = new JWT();
             Object obj = jwt.decodeJWT(token);
             System.out.println(obj);
+            operaciones=(IOperacionesEmpresa)Naming.lookup("rmi://localhost/Operaciones");
+            String pago = operaciones.pagar(pendientes);
+            if(pago.length() > 0){
+                lbpago.setText("El pago se a relizado con exito");
+                String cabecera [] = {"Empresa","Id Factura", "Monto"};
+                String datos[][] = {};
+                modelo = new DefaultTableModel(datos,cabecera);
+                tbLista.setModel(modelo);
+                
+            }
         } catch (Exception e) {
             System.err.println("El token a exirado...."+ e.getMessage());
             Login login = new Login();
@@ -165,9 +205,10 @@ public class Pagar extends javax.swing.JFrame {
         int idcliente = Integer.parseInt(txtIdCliente.getText());
         String pago="";
 	try {
+            JWT jwt = new JWT();
+            Object obj = jwt.decodeJWT(token);
+            System.out.println(obj);
 	    operaciones=(IOperacionesEmpresa)Naming.lookup("rmi://localhost/Operaciones");
-            System.out.println("Introduzca IdCliente");
-	    System.out.println("------------Facturas Pendientes -----------");
 	    pendientes = operaciones.calcular(idcliente);
             System.err.println(pendientes);
             for(Factura f:pendientes){
@@ -187,7 +228,10 @@ public class Pagar extends javax.swing.JFrame {
                 System.out.println();
 	}
 	catch (Exception e){
-	    e.printStackTrace();
+	     System.err.println("El token a exirado...."+ e.getMessage());
+            Login login = new Login();
+            login.show();
+            setVisible(false);
 	}
     }//GEN-LAST:event_btnBuscarActionPerformed
 
@@ -231,8 +275,11 @@ public class Pagar extends javax.swing.JFrame {
     private javax.swing.JButton btnPagar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lbCotizacion;
+    private javax.swing.JLabel lbpago;
     private javax.swing.JTable tbLista;
     private javax.swing.JTextField txtIdCliente;
     // End of variables declaration//GEN-END:variables

@@ -37,9 +37,6 @@ public class facturasImpl extends cotesinterfacePOA{
                 String id_c = rst.getString("id_cliente");
                 String monto = rst.getString("monto");
                 String estado = rst.getString("estado");
-                //DefaultTableModel dftable = (DefaultTableModel) TablaU.getModel();
-                //Object obj[] = {apellidos,nombres,ci,fecha_de_nacimiento,genero};
-                //dftable.addRow(obj);
                 aux+=id_f+"-"+monto+",";
             }
         } catch (SQLException ex) {
